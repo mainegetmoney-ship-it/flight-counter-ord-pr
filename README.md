@@ -1,85 +1,57 @@
-# ✈️ Chicago (ORD) ⇄ Puerto Rico Flight Counter & Tracker
+# ORD, Puerto Rico, New York, and Dubai Flight Counter
 
-A fast, lightweight, and modern web application to count and track flights traveling between **Chicago O'Hare (ORD)** and **Puerto Rico (San Juan SJU & Aguadilla BQN)** back and forth.
+A lightweight browser-based application for logging and filtering flights across Chicago O'Hare, Puerto Rico, New York, and Dubai routes.
 
----
+## Current Route Patch
 
-## 📁 Project Structure (Google Drive Storage)
+The current feature branch adds:
 
+- Puerto Rico to New York using SJU, BQN, or PSE to JFK
+- New York to Dubai using JFK to DXB
+- Route filters for ORD and Puerto Rico, Puerto Rico and New York, and New York and Dubai
+- Sample flights for SJU to JFK and JFK to DXB
+- Add Flight modal options for all supported routes
+
+The existing browser data key remains:
+
+```text
+ord_pr_flight_tracker_v1
 ```
-G:\My Drive\Colab\flight-counter-ord-pr/
-├── public/
-│   ├── index.html       # Main UI with responsive Tailwind styling & interactive widgets
-│   ├── app.js           # Flight counter logic, LocalStorage sync, quick +1 & filters
-│   └── styles.css       # Custom styles, animations, and badges
-├── firebase.json        # Firebase Hosting configuration (production ready)
-├── .firebaserc          # Firebase project alias
-├── .gitignore           # Git ignore rules
-├── package.json         # Quick commands for running & deploying
-└── README.md            # Documentation & setup guide
-```
 
----
+## Local Preview
 
-## ⚡ How to Open and Test the App
-
-### Option 1: Direct File Open
-You can open [`public/index.html`](file:///G:/My%20Drive/Colab/flight-counter-ord-pr/public/index.html) directly in any web browser (Chrome, Edge, Safari, Firefox) on your machine.
-
-### Option 2: Local Server Preview (Port 8080)
-From the project folder, run:
 ```bash
 npm start
 ```
-or
+
+Then open `http://localhost:8080`.
+
+## Validation
+
 ```bash
-npx -y serve public -p 8080
+node --check public/app.js
 ```
-Open [http://localhost:8080](http://localhost:8080).
 
----
+## Firebase Project
 
-## 💬 How to Edit Directly from This Chat
-You never need to struggle in terminal prompts or slow external chats! Simply ask here:
-- *"Add a weather widget for San Juan and Chicago"*
-- *"Change the color scheme to navy and gold"*
-- *"Add a flight duration calculator"*
-- *"Add export to CSV button"*
-
-All edits will be made immediately to your files in `G:\My Drive\Colab\flight-counter-ord-pr/`.
-
----
-
-## 🚀 Firebase Hosting Deployment
-
-1. **Log in to Firebase** (one-time setup if not already authenticated):
-   ```bash
-   npx -y firebase-tools login
-   ```
-
-2. **Select or Set your Firebase Project**:
-   ```bash
-   npx -y firebase-tools use --add
-   ```
-
-3. **Deploy to Firebase Hosting**:
-   ```bash
-   npm run deploy
-   ```
-   *(or `npx -y firebase-tools deploy --only hosting`)*
-
----
-
-## 🐙 Git & GitHub Repository Setup
-
-To initialize this project in Git and push to your GitHub:
-```bash
-cd "G:\My Drive\Colab\flight-counter-ord-pr"
-git init
-git add .
-git commit -m "Initial commit: Chicago (ORD) to Puerto Rico flight counter web app"
-git branch -M main
-# Add your GitHub remote repository:
-# git remote add origin https://github.com/<your-username>/flight-counter-ord-pr.git
-# git push -u origin main
+```text
+ord-pr-flight-counter
 ```
+
+Firebase Hosting serves the `public/` directory according to `firebase.json`.
+
+## GitHub to Firebase Deployment
+
+GitHub Actions expects the repository secret:
+
+```text
+FIREBASE_SERVICE_ACCOUNT_ORD_PR_FLIGHT_COUNTER
+```
+
+The value must be the Firebase service account JSON for the `ord-pr-flight-counter` project. Never commit that JSON to the repository.
+
+After the secret is configured:
+
+- Pull requests create temporary Firebase Hosting preview deployments.
+- Pushes to `main` deploy to the live Firebase Hosting channel.
+- A patch is complete only after Firebase deploys it and the test URL is provided.
