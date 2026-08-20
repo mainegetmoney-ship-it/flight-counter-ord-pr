@@ -1,23 +1,18 @@
-name: Firebase Hosting
+name: Firebase Hosting Preview
 
 on:
   push:
     branches:
-      - main
       - 'chatgpt/**'
   workflow_dispatch:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
-  deploy:
+  deploy-preview:
     runs-on: ubuntu-latest
-    env:
-      FIREBASE_PROJECT_ID: ord-pr-flight-counter
-      FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORD_PR_FLIGHT_COUNTER }}
-      FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -27,47 +22,20 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validate app JavaScript
+      - name: Validate application JavaScript
         run: node --check public/app.js
 
-      - name: Prepare Firebase authentication
-        id: auth
-        shell: bash
-        run: |
-          if [ -n "$FIREBASE_SERVICE_ACCOUNT_JSON" ]; then
-            printf '%s' "$FIREBASE_SERVICE_ACCOUNT_JSON" > "$RUNNER_TEMP/firebase-service-account.json"
-            echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/firebase-service-account.json" >> "$GITHUB_ENV"
-            echo "mode=service-account" >> "$GITHUB_OUTPUT"
-          elif [ -n "$FIREBASE_TOKEN" ]; then
-            echo "mode=token" >> "$GITHUB_OUTPUT"
-          else
-            echo "Firebase authentication is not configured."
-            echo "Add repository secret FIREBASE_SERVICE_ACCOUNT_ORD_PR_FLIGHT_COUNTER or FIREBASE_TOKEN."
-            exit 1
-          fi
+      - name: Deploy Firebase Hosting preview
+        id: firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORD_PR_FLIGHT_COUNTER }}'
+          projectId: ord-pr-flight-counter
+          channelId: chatgpt-routes
+          expires: 7d
 
-      - name: Deploy production Hosting
-        if: github.ref == 'refs/heads/main'
-        shell: bash
+      - name: Record preview URL
         run: |
-          if [ "${{ steps.auth.outputs.mode }}" = "token" ]; then
-            npx --yes firebase-tools@latest deploy --only hosting --project "$FIREBASE_PROJECT_ID" --non-interactive --token "$FIREBASE_TOKEN"
-          else
-            npx --yes firebase-tools@latest deploy --only hosting --project "$FIREBASE_PROJECT_ID" --non-interactive
-          fi
-
-      - name: Deploy preview channel
-        if: github.ref != 'refs/heads/main'
-        shell: bash
-        run: |
-          CHANNEL_ID="chatgpt-${GITHUB_SHA::7}"
-          if [ "${{ steps.auth.outputs.mode }}" = "token" ]; then
-            npx --yes firebase-tools@latest hosting:channel:deploy "$CHANNEL_ID" --expires 7d --project "$FIREBASE_PROJECT_ID" --non-interactive --token "$FIREBASE_TOKEN" | tee "$RUNNER_TEMP/firebase-preview.log"
-          else
-            npx --yes firebase-tools@latest hosting:channel:deploy "$CHANNEL_ID" --expires 7d --project "$FIREBASE_PROJECT_ID" --non-interactive | tee "$RUNNER_TEMP/firebase-preview.log"
-          fi
-          PREVIEW_URL=$(grep -Eo 'https://[^ ]+\.web\.app' "$RUNNER_TEMP/firebase-preview.log" | tail -1 || true)
-          if [ -n "$PREVIEW_URL" ]; then
-            echo "### Firebase preview" >> "$GITHUB_STEP_SUMMARY"
-            echo "$PREVIEW_URL" >> "$GITHUB_STEP_SUMMARY"
-          fi
+          echo "### Firebase Preview" >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ steps.firebase.outputs.details_url }}" >> "$GITHUB_STEP_SUMMARY"
