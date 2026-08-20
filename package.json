@@ -5,7 +5,8 @@
   "main": "public/index.html",
   "scripts": {
     "start": "npx -y serve public -p 8080",
-    "check": "node --check public/app.js",
+    "check": "node --check public/app.js && node --check server/firebase-admin.js",
+    "admin:check": "node server/firebase-admin.js",
     "preview": "npx -y firebase-tools emulators:start --only hosting",
     "deploy": "npx -y firebase-tools deploy --only hosting"
   },
@@ -18,5 +19,8 @@
     "firebase-hosting"
   ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "firebase-admin": "^13.0.0"
+  }
 }

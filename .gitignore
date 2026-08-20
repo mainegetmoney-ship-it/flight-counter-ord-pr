@@ -1,6 +1,13 @@
 # Dependencies
 node_modules/
 
+# Firebase credentials — never commit service account JSON
+serviceAccountKey.json
+*serviceAccount*.json
+*service-account*.json
+.env
+.env.*
+
 # Firebase
 .firebase/
 firebase-debug.log
