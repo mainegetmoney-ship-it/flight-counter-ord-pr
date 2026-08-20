@@ -1,10 +1,11 @@
 {
   "name": "flight-counter-ord-pr",
-  "version": "1.0.0",
-  "description": "Chicago (ORD) to Puerto Rico (SJU/BQN) Flight Counter & Tracker web app",
+  "version": "1.1.0",
+  "description": "Multi-route flight counter for Chicago, Puerto Rico, New York, and Dubai",
   "main": "public/index.html",
   "scripts": {
     "start": "npx -y serve public -p 8080",
+    "check": "node --check public/app.js",
     "preview": "npx -y firebase-tools emulators:start --only hosting",
     "deploy": "npx -y firebase-tools deploy --only hosting"
   },
@@ -12,6 +13,8 @@
     "flight-tracker",
     "chicago-ord",
     "puerto-rico-sju",
+    "new-york-jfk",
+    "dubai-dxb",
     "firebase-hosting"
   ],
   "author": "",
