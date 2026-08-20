@@ -10,6 +10,7 @@
 - **App Name**: ORD, Puerto Rico, New York, and Dubai Flight Counter & Tracker
 - **Canonical Local Workspace**: `G:\My Drive\Colab\flight-counter-ord-pr`
 - **GitHub Repository**: `https://github.com/mainegetmoney-ship-it/flight-counter-ord-pr`
+- **Draft Pull Request**: `https://github.com/mainegetmoney-ship-it/flight-counter-ord-pr/pull/1`
 - **Firebase Project**: `ord-pr-flight-counter`
 - **Hosting Engine**: Firebase Hosting, serving `public/`
 - **Current Patch Branch**: `chatgpt/add-pr-jfk-dxb-routes`
@@ -27,7 +28,6 @@
 | `firebase.json` | Firebase Hosting configuration serving `public/` with SPA rewrite |
 | `.firebaserc` | Firebase project alias for `ord-pr-flight-counter` |
 | `.github/workflows/firebase-hosting-pull-request.yml` | Firebase preview deployment for pull requests |
-| `.github/workflows/firebase-hosting-merge.yml` | Firebase production deployment after changes reach `main` |
 | `AGENTS.md` | Repository modification and verification policy |
 
 ---
@@ -67,12 +67,13 @@ The repository uses the GitHub Actions secret:
 
 This secret must contain the Firebase service account JSON generated for the `ord-pr-flight-counter` project. Never place the JSON in repository files, commits, chat messages, or logs.
 
-Once the secret is configured:
+Current preview flow:
 
-1. Pull requests deploy to a temporary Firebase Hosting preview channel.
-2. The Firebase action posts the preview URL to the pull request.
-3. Pushes to `main` deploy to the live Firebase Hosting channel.
-4. A patch is not complete until the deployed commit and Firebase test URL are reported.
+1. A draft pull request targets `main`.
+2. The Firebase preview workflow validates `public/app.js`.
+3. The Firebase action deploys a temporary Hosting preview channel.
+4. The action posts the preview URL to the pull request.
+5. A patch is not complete until the deployed commit and Firebase test URL are reported.
 
 ---
 
@@ -85,3 +86,4 @@ Once the secret is configured:
 5. Commit and push only when authorized.
 6. Deploy only through Firebase Hosting.
 7. Always provide the actual Firebase test URL after successful deployment.
+8. Keep PR #1 draft and unmerged until physical testing is approved.
