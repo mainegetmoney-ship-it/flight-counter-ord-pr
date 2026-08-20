@@ -10,6 +10,8 @@ flight-counter-ord-pr/
 │   ├── index.html
 │   ├── app.js
 │   └── styles.css
+├── server/
+│   └── firebase-admin.js
 ├── .github/workflows/
 │   ├── firebase-hosting-pull-request.yml
 │   └── firebase-hosting-merge.yml
@@ -65,6 +67,43 @@ firebase init hosting:github
 ```
 
 Select repository `mainegetmoney-ship-it/flight-counter-ord-pr` and Firebase project `ord-pr-flight-counter`.
+
+## Firebase Admin SDK
+
+`server/firebase-admin.js` initializes the Firebase Admin SDK for server-side and
+administrative tasks. It is Node-only — the browser app in `public/` never imports it.
+
+```bash
+npm install
+```
+
+```js
+const { initializeFirebaseAdmin } = require('./server/firebase-admin');
+
+const app = initializeFirebaseAdmin();
+```
+
+Credentials are read from the environment, never from a file in this repository:
+
+| Variable | Purpose |
+| :--- | :--- |
+| `FIREBASE_SERVICE_ACCOUNT` | Service account JSON, raw or base64 |
+| `FIREBASE_SERVICE_ACCOUNT_PATH` | Path to a service account JSON file |
+| `GOOGLE_APPLICATION_CREDENTIALS` | Path to a service account JSON file |
+| `FIREBASE_PROJECT_ID` | Overrides the default `ord-pr-flight-counter` |
+
+If none are set, Application Default Credentials are used (`gcloud auth
+application-default login`, Cloud Run, or Cloud Functions).
+
+Verify which source is configured, without printing any secret:
+
+```bash
+npm run admin:check
+```
+
+Service account JSON must never be committed. `.gitignore` blocks the common
+filenames, and the Firebase console snippet that hardcodes
+`require('path/to/serviceAccountKey.json')` should not be used here.
 
 ## Persistent Browser Data
 
