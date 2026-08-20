@@ -3,9 +3,12 @@
 **Read first:** `AGENT_HANDOFF.md`
 
 Mandatory rules:
-1. Follow user's current instruction and edit files directly in `G:\My Drive\Colab\flight-counter-ord-pr`.
-2. Inspect project files before choosing commands or tools.
-3. Preserve unrelated files, user data in `localStorage`, and secrets.
-4. Verify results using native syntax checks (`node -c public/app.js`) and local preview before handoff.
-5. Do not commit, push, deploy, or delete without authorization and verified targets.
-6. Keep `AGENT_HANDOFF.md` updated whenever features, architecture, or files change.
+1. Follow the user's current instruction and inspect the repository before changing files.
+2. Preserve unrelated files, user data in `localStorage`, and secrets.
+3. Keep `ord_pr_flight_tracker_v1` unchanged unless the user explicitly approves a migration.
+4. Verify JavaScript changes using `node --check public/app.js` before deployment.
+5. Do not delete, merge, or overwrite production data without explicit authorization.
+6. Keep `AGENT_HANDOFF.md` updated whenever features, routes, architecture, or deployment behavior change.
+7. Use GitHub for source control and Firebase Hosting for preview and production deployment.
+8. Never commit Firebase service account JSON, Firebase tokens, or other credentials.
+9. A patch is not complete merely because code was committed. Completion requires the deployed commit, deployment status, and the actual Firebase test URL.
