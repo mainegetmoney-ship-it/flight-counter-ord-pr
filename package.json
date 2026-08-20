@@ -1,0 +1,19 @@
+{
+  "name": "flight-counter-ord-pr",
+  "version": "1.0.0",
+  "description": "Chicago (ORD) to Puerto Rico (SJU/BQN) Flight Counter & Tracker web app",
+  "main": "public/index.html",
+  "scripts": {
+    "start": "npx -y serve public -p 8080",
+    "preview": "npx -y firebase-tools emulators:start --only hosting",
+    "deploy": "npx -y firebase-tools deploy --only hosting"
+  },
+  "keywords": [
+    "flight-tracker",
+    "chicago-ord",
+    "puerto-rico-sju",
+    "firebase-hosting"
+  ],
+  "author": "",
+  "license": "MIT"
+}
