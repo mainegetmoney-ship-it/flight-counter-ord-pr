@@ -31,18 +31,16 @@ Then open `http://localhost:8080`.
 ## Validation
 
 ```bash
-node --check public/app.js
+npm run check
 ```
 
 ## Firebase Project
-
-Firebase project ID:
 
 ```text
 ord-pr-flight-counter
 ```
 
-Firebase Hosting serves the `public/` directory according to `firebase.json`.
+Firebase Hosting serves `public/` according to `firebase.json`.
 
 ## GitHub to Firebase Deployment
 
@@ -52,21 +50,21 @@ GitHub Actions expects this repository secret:
 FIREBASE_SERVICE_ACCOUNT_ORD_PR_FLIGHT_COUNTER
 ```
 
-The value must be the Firebase service account JSON for the `ord-pr-flight-counter` project. Never commit the JSON to the repository.
+The value must be the Firebase service account JSON for the `ord-pr-flight-counter` project. Never commit that JSON to the repository.
 
 After the secret is configured:
 
 - Pull requests create temporary Firebase Hosting preview deployments.
-- Merges or pushes to `main` deploy to the live Firebase Hosting channel.
-- A patch is complete only when its Firebase deployment succeeds and the test URL is provided.
+- Pushes to `main` deploy to the live Firebase Hosting channel.
+- A patch is complete only after Firebase deploys it and the test URL is provided.
 
-The official Firebase CLI can create the service account connection with:
+The one-time official Firebase setup command is:
 
 ```bash
 firebase init hosting:github
 ```
 
-Choose repository `mainegetmoney-ship-it/flight-counter-ord-pr` and Firebase project `ord-pr-flight-counter`.
+Select repository `mainegetmoney-ship-it/flight-counter-ord-pr` and Firebase project `ord-pr-flight-counter`.
 
 ## Persistent Browser Data
 
