@@ -2,22 +2,20 @@
 
 A lightweight browser-based application for logging and filtering flights across Chicago O'Hare, Puerto Rico, New York, and Dubai routes.
 
-## Project Structure
+## Current Route Patch
+
+The current feature branch adds:
+
+- Puerto Rico to New York using SJU, BQN, or PSE to JFK
+- New York to Dubai using JFK to DXB
+- Route filters for ORD and Puerto Rico, Puerto Rico and New York, and New York and Dubai
+- Sample flights for SJU to JFK and JFK to DXB
+- Add Flight modal options for all supported routes
+
+The existing browser data key remains:
 
 ```text
-flight-counter-ord-pr/
-├── public/
-│   ├── index.html
-│   ├── app.js
-│   └── styles.css
-├── .github/workflows/
-│   ├── firebase-hosting-pull-request.yml
-│   └── firebase-hosting-merge.yml
-├── firebase.json
-├── .firebaserc
-├── AGENT_HANDOFF.md
-├── AGENTS.md
-└── package.json
+ord_pr_flight_tracker_v1
 ```
 
 ## Local Preview
@@ -31,7 +29,7 @@ Then open `http://localhost:8080`.
 ## Validation
 
 ```bash
-npm run check
+node --check public/app.js
 ```
 
 ## Firebase Project
@@ -40,11 +38,11 @@ npm run check
 ord-pr-flight-counter
 ```
 
-Firebase Hosting serves `public/` according to `firebase.json`.
+Firebase Hosting serves the `public/` directory according to `firebase.json`.
 
 ## GitHub to Firebase Deployment
 
-GitHub Actions expects this repository secret:
+GitHub Actions expects the repository secret:
 
 ```text
 FIREBASE_SERVICE_ACCOUNT_ORD_PR_FLIGHT_COUNTER
@@ -57,21 +55,3 @@ After the secret is configured:
 - Pull requests create temporary Firebase Hosting preview deployments.
 - Pushes to `main` deploy to the live Firebase Hosting channel.
 - A patch is complete only after Firebase deploys it and the test URL is provided.
-
-The one-time official Firebase setup command is:
-
-```bash
-firebase init hosting:github
-```
-
-Select repository `mainegetmoney-ship-it/flight-counter-ord-pr` and Firebase project `ord-pr-flight-counter`.
-
-## Persistent Browser Data
-
-Flight records remain stored under:
-
-```text
-ord_pr_flight_tracker_v1
-```
-
-Code deployments must not rename or clear this key.

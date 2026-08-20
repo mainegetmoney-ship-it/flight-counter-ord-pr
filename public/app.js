@@ -1,8 +1,8 @@
-// Chicago (ORD) ⇄ Puerto Rico Flight Counter App Logic
+// Multi-route Flight Counter App Logic
 
 const STORAGE_KEY = 'ord_pr_flight_tracker_v1';
+const PR_AIRPORTS = new Set(['SJU', 'BQN', 'PSE']);
 
-// Initial / Sample Flight Data
 const SAMPLE_FLIGHTS = [
   {
     id: 'fl-' + Date.now() + '-1',
@@ -69,15 +69,35 @@ const SAMPLE_FLIGHTS = [
     time: new Date(Date.now() - 7 * 3600000).toISOString().slice(0, 16),
     status: 'Landed',
     notes: 'Airbus A320'
+  },
+  {
+    id: 'fl-' + Date.now() + '-7',
+    direction: 'SJU-JFK',
+    origin: 'SJU',
+    destination: 'JFK',
+    airline: 'JetBlue Airways',
+    flightNo: 'B6 1001',
+    time: new Date(Date.now() + 6 * 3600000).toISOString().slice(0, 16),
+    status: 'Scheduled',
+    notes: 'Puerto Rico to New York sample route'
+  },
+  {
+    id: 'fl-' + Date.now() + '-8',
+    direction: 'JFK-DXB',
+    origin: 'JFK',
+    destination: 'DXB',
+    airline: 'Emirates',
+    flightNo: 'EK 202',
+    time: new Date(Date.now() + 10 * 3600000).toISOString().slice(0, 16),
+    status: 'Scheduled',
+    notes: 'New York to Dubai sample route'
   }
 ];
 
-// App State
 let flights = [];
 let currentFilter = 'all';
 let searchQuery = '';
 
-// Load Flights from LocalStorage
 function loadFlights() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -93,7 +113,6 @@ function loadFlights() {
   }
 }
 
-// Save Flights to LocalStorage
 function saveFlights() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(flights));
@@ -102,7 +121,6 @@ function saveFlights() {
   }
 }
 
-// Format ISO date string into readable 12-hour format
 function formatDateTime(isoString) {
   if (!isoString) return 'N/A';
   const date = new Date(isoString);
@@ -116,42 +134,50 @@ function formatDateTime(isoString) {
   });
 }
 
-// Update UI Statistics
+function isOrdToPr(flight) {
+  return flight.origin === 'ORD' && PR_AIRPORTS.has(flight.destination);
+}
+
+function isPrToOrd(flight) {
+  return PR_AIRPORTS.has(flight.origin) && flight.destination === 'ORD';
+}
+
+function matchesRouteFilter(flight) {
+  if (currentFilter === 'all') return true;
+  if (currentFilter === 'ORD-PR') return isOrdToPr(flight) || isPrToOrd(flight);
+  if (currentFilter === 'PR-NYC') return PR_AIRPORTS.has(flight.origin) && flight.destination === 'JFK';
+  if (currentFilter === 'NYC-DXB') return flight.origin === 'JFK' && flight.destination === 'DXB';
+  return true;
+}
+
 function updateStats() {
   const total = flights.length;
-  const ordToPr = flights.filter(f => f.direction.startsWith('ORD')).length;
-  const prToOrd = flights.filter(f => !f.direction.startsWith('ORD')).length;
+  const ordToPr = flights.filter(isOrdToPr).length;
+  const prToOrd = flights.filter(isPrToOrd).length;
   const active = flights.filter(f => f.status === 'In Flight').length;
+  const ordPrTotal = ordToPr + prToOrd;
 
-  const ordPct = total > 0 ? Math.round((ordToPr / total) * 100) : 0;
-  const prPct = total > 0 ? Math.round((prToOrd / total) * 100) : 0;
+  const ordPct = ordPrTotal > 0 ? Math.round((ordToPr / ordPrTotal) * 100) : 0;
+  const prPct = ordPrTotal > 0 ? Math.round((prToOrd / ordPrTotal) * 100) : 0;
 
-  // DOM Stats
   document.getElementById('stat-total-flights').textContent = total;
   document.getElementById('stat-ord-to-pr').textContent = ordToPr;
   document.getElementById('stat-pr-to-ord').textContent = prToOrd;
   document.getElementById('stat-active-flights').textContent = active;
-
   document.getElementById('stat-ord-pr-pct').textContent = `${ordPct}%`;
   document.getElementById('stat-pr-ord-pct').textContent = `${prPct}%`;
-
   document.getElementById('visual-ord-count').textContent = `${ordToPr} outbound`;
   document.getElementById('visual-pr-count').textContent = `${prToOrd} inbound`;
 }
 
-// Render Flights Table
 function renderFlights() {
   const tbody = document.getElementById('flights-table-body');
   const emptyState = document.getElementById('empty-state');
   const countDisplay = document.getElementById('flight-list-count');
 
-  // Filter flights
   let filtered = flights.filter(flight => {
-    // Direction filter
-    if (currentFilter === 'ORD-PR' && !flight.direction.startsWith('ORD')) return false;
-    if (currentFilter === 'PR-ORD' && flight.direction.startsWith('ORD')) return false;
+    if (!matchesRouteFilter(flight)) return false;
 
-    // Search query filter
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       const matchNo = flight.flightNo?.toLowerCase().includes(q);
@@ -164,9 +190,7 @@ function renderFlights() {
     return true;
   });
 
-  // Sort latest first
   filtered.sort((a, b) => new Date(b.time || 0) - new Date(a.time || 0));
-
   countDisplay.textContent = `Showing ${filtered.length} of ${flights.length} flights`;
 
   if (filtered.length === 0) {
@@ -179,24 +203,27 @@ function renderFlights() {
   emptyState.classList.add('hidden');
   emptyState.classList.remove('flex');
 
-  // Render Table Rows
   tbody.innerHTML = filtered.map(flight => {
-    const isOutbound = flight.direction.startsWith('ORD');
+    const isReturnToOrd = flight.destination === 'ORD';
+    const routeColor = isReturnToOrd ? 'text-emerald-400' : 'text-cyan-400';
+    const routeIcon = isReturnToOrd ? 'arrow-left' : 'arrow-right';
+    const planeIcon = isReturnToOrd ? 'plane-landing' : 'plane-takeoff';
     const badgeColorClass = getStatusBadgeClass(flight.status);
-    const routeLabel = isOutbound
-      ? `<span class="inline-flex items-center gap-1 text-cyan-400 font-semibold"><i data-lucide="arrow-right" class="w-3 h-3"></i> ${flight.origin} ➔ ${flight.destination}</span>`
-      : `<span class="inline-flex items-center gap-1 text-emerald-400 font-semibold"><i data-lucide="arrow-left" class="w-3 h-3"></i> ${flight.origin} ➔ ${flight.destination}</span>`;
 
     return `
       <tr class="hover:bg-slate-800/40 transition-colors group">
         <td class="px-4 py-3 font-mono font-bold text-white whitespace-nowrap">
           <div class="flex items-center gap-2">
-            <i data-lucide="${isOutbound ? 'plane-takeoff' : 'plane-landing'}" class="w-3.5 h-3.5 ${isOutbound ? 'text-cyan-400' : 'text-emerald-400'}"></i>
+            <i data-lucide="${planeIcon}" class="w-3.5 h-3.5 ${routeColor}"></i>
             <span>${escapeHtml(flight.flightNo)}</span>
           </div>
         </td>
         <td class="px-4 py-3 text-slate-300 whitespace-nowrap">${escapeHtml(flight.airline)}</td>
-        <td class="px-4 py-3 whitespace-nowrap">${routeLabel}</td>
+        <td class="px-4 py-3 whitespace-nowrap">
+          <span class="inline-flex items-center gap-1 ${routeColor} font-semibold">
+            <i data-lucide="${routeIcon}" class="w-3 h-3"></i> ${escapeHtml(flight.origin)} ➔ ${escapeHtml(flight.destination)}
+          </span>
+        </td>
         <td class="px-4 py-3 text-slate-300 font-mono text-[11px] whitespace-nowrap">${formatDateTime(flight.time)}</td>
         <td class="px-4 py-3 whitespace-nowrap">
           <span class="px-2.5 py-0.5 rounded-full text-[11px] font-medium ${badgeColorClass}">
@@ -213,21 +240,16 @@ function renderFlights() {
     `;
   }).join('');
 
-  // Re-initialize Lucide icons
-  if (window.lucide) {
-    window.lucide.createIcons();
-  }
+  if (window.lucide) window.lucide.createIcons();
 }
 
-// Helpers
 function getStatusBadgeClass(status) {
   switch (status) {
     case 'In Flight': return 'badge-inflight';
     case 'Landed': return 'badge-landed';
     case 'Delayed': return 'badge-delayed';
     case 'Scheduled':
-    default:
-      return 'badge-scheduled';
+    default: return 'badge-scheduled';
   }
 }
 
@@ -244,7 +266,6 @@ function escapeHtml(str) {
   });
 }
 
-// Global actions
 window.deleteFlight = function(id) {
   flights = flights.filter(f => f.id !== id);
   saveFlights();
@@ -252,13 +273,12 @@ window.deleteFlight = function(id) {
   renderFlights();
 };
 
-// Quick Add Outbound (ORD -> PR)
 function quickAddOrdPr() {
   const flightNums = ['UA 1700', 'AA 2468', 'F9 2024', 'NK 880', 'B6 910'];
   const airlines = ['United Airlines', 'American Airlines', 'Frontier Airlines', 'Spirit Airlines', 'JetBlue Airways'];
   const randIndex = Math.floor(Math.random() * flightNums.length);
 
-  const newFlight = {
+  flights.unshift({
     id: 'fl-' + Date.now(),
     direction: 'ORD-SJU',
     origin: 'ORD',
@@ -268,21 +288,19 @@ function quickAddOrdPr() {
     time: new Date().toISOString().slice(0, 16),
     status: 'In Flight',
     notes: 'Quick logged ORD ➔ SJU'
-  };
+  });
 
-  flights.unshift(newFlight);
   saveFlights();
   updateStats();
   renderFlights();
 }
 
-// Quick Add Inbound (PR -> ORD)
 function quickAddPrOrd() {
   const flightNums = ['UA 1701', 'AA 2469', 'F9 2025', 'NK 881', 'B6 911'];
   const airlines = ['United Airlines', 'American Airlines', 'Frontier Airlines', 'Spirit Airlines', 'JetBlue Airways'];
   const randIndex = Math.floor(Math.random() * flightNums.length);
 
-  const newFlight = {
+  flights.unshift({
     id: 'fl-' + Date.now(),
     direction: 'SJU-ORD',
     origin: 'SJU',
@@ -292,30 +310,23 @@ function quickAddPrOrd() {
     time: new Date().toISOString().slice(0, 16),
     status: 'In Flight',
     notes: 'Quick logged SJU ➔ ORD'
-  };
+  });
 
-  flights.unshift(newFlight);
   saveFlights();
   updateStats();
   renderFlights();
 }
 
-// Event Listeners Setup
 document.addEventListener('DOMContentLoaded', () => {
   loadFlights();
   updateStats();
   renderFlights();
 
-  // Initialize Lucide Icons
-  if (window.lucide) {
-    window.lucide.createIcons();
-  }
+  if (window.lucide) window.lucide.createIcons();
 
-  // Quick Add Buttons
   document.getElementById('quick-add-ord-pr')?.addEventListener('click', quickAddOrdPr);
   document.getElementById('quick-add-pr-ord')?.addEventListener('click', quickAddPrOrd);
 
-  // Seed sample schedule button
   document.getElementById('seed-data-btn')?.addEventListener('click', () => {
     flights = [...SAMPLE_FLIGHTS];
     saveFlights();
@@ -323,7 +334,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderFlights();
   });
 
-  // Clear all button
   document.getElementById('clear-all-btn')?.addEventListener('click', () => {
     if (confirm('Clear all logged flights?')) {
       flights = [];
@@ -333,29 +343,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Direction filter buttons
   const filterBtns = document.querySelectorAll('.filter-btn');
   filterBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', () => {
       filterBtns.forEach(b => {
         b.classList.remove('active', 'text-white', 'bg-slate-800');
         b.classList.add('text-slate-400');
       });
       btn.classList.add('active', 'text-white', 'bg-slate-800');
       btn.classList.remove('text-slate-400');
-
       currentFilter = btn.getAttribute('data-filter');
       renderFlights();
     });
   });
 
-  // Search input
   document.getElementById('search-input')?.addEventListener('input', (e) => {
     searchQuery = e.target.value.trim();
     renderFlights();
   });
 
-  // Modal Controls
   const modal = document.getElementById('flight-modal');
   const openModalBtn = document.getElementById('open-add-modal-btn');
   const closeModalBtn = document.getElementById('close-modal-btn');
@@ -363,7 +369,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const flightForm = document.getElementById('add-flight-form');
 
   const openModal = () => {
-    // Set default time to now
     document.getElementById('modal-time').value = new Date().toISOString().slice(0, 16);
     modal.classList.remove('hidden');
     modal.classList.add('flex');
@@ -380,28 +385,24 @@ document.addEventListener('DOMContentLoaded', () => {
   closeModalBtn?.addEventListener('click', closeModal);
   cancelModalBtn?.addEventListener('click', closeModal);
 
-  // Form Submit
   flightForm?.addEventListener('submit', (e) => {
     e.preventDefault();
 
     const dirVal = document.getElementById('modal-direction').value;
-    const parts = dirVal.split('-');
-    const origin = parts[0];
-    const destination = parts[1];
+    const [origin, destination] = dirVal.split('-');
 
-    const newFlight = {
+    flights.unshift({
       id: 'fl-' + Date.now(),
       direction: dirVal,
-      origin: origin,
-      destination: destination,
+      origin,
+      destination,
       airline: document.getElementById('modal-airline').value,
       flightNo: document.getElementById('modal-flight-no').value.trim(),
       time: document.getElementById('modal-time').value,
       status: document.getElementById('modal-status').value,
       notes: document.getElementById('modal-notes').value.trim()
-    };
+    });
 
-    flights.unshift(newFlight);
     saveFlights();
     updateStats();
     renderFlights();

@@ -12,4 +12,3 @@ Mandatory rules:
 7. Use GitHub for source control and Firebase Hosting for preview and production deployment.
 8. Never commit Firebase service account JSON, Firebase tokens, or other credentials.
 9. A patch is not complete merely because code was committed. Completion requires the deployed commit, deployment status, and the actual Firebase test URL.
-10. Firebase preview deployments must use `.github/workflows/firebase-hosting-pull-request.yml`; production uses `.github/workflows/firebase-hosting-merge.yml`.

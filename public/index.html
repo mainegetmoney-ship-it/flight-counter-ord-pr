@@ -3,33 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ORD ⇄ Puerto Rico Flight Counter</title>
-  <!-- Tailwind CSS CDN -->
+  <title>Multi Route Flight Counter</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-cyan-500 selection:text-white">
-
-  <!-- Header -->
   <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-30 px-4 lg:px-8 py-3.5">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 flex-shrink-0">
           <i data-lucide="plane-takeoff" class="w-5 h-5 text-white"></i>
         </div>
-        <div>
-          <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
-            ORD <i data-lucide="arrow-left-right" class="w-4 h-4 text-cyan-400"></i> Puerto Rico
+        <div class="min-w-0">
+          <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2 flex-wrap">
+            Multi Route Flight Counter
             <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/60">Live Counter</span>
           </h1>
-          <p class="text-xs text-slate-400">Chicago O'Hare ⇄ San Juan (SJU) &amp; Aguadilla (BQN)</p>
+          <p class="text-xs text-slate-400 truncate">ORD ⇄ Puerto Rico • SJU ➔ JFK • JFK ➔ DXB</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2 sm:gap-3">
-        <button id="seed-data-btn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition-colors border border-slate-700/60" title="Load sample non-stop schedule">
+      <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+        <button id="seed-data-btn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition-colors border border-slate-700/60" title="Load sample schedule">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-cyan-400"></i>
           <span class="hidden sm:inline">Load Sample Schedule</span>
         </button>
@@ -41,319 +37,87 @@
     </div>
   </header>
 
-  <!-- Main Content -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-6">
-
-    <!-- Quick Stats Cards Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      
-      <!-- Total Flights Card -->
       <div class="stat-card bg-slate-900/90 border border-slate-800 rounded-2xl p-5 relative overflow-hidden group hover:border-slate-700 transition-all">
         <div class="flex items-center justify-between mb-3">
           <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Flights Tracked</span>
-          <div class="p-2 rounded-xl bg-slate-800 text-slate-300">
-            <i data-lucide="plane" class="w-4 h-4 text-cyan-400"></i>
-          </div>
+          <div class="p-2 rounded-xl bg-slate-800 text-slate-300"><i data-lucide="plane" class="w-4 h-4 text-cyan-400"></i></div>
         </div>
-        <div class="flex items-baseline gap-2">
-          <span id="stat-total-flights" class="text-3xl font-extrabold text-white tracking-tight">0</span>
-          <span class="text-xs text-slate-500">flights</span>
-        </div>
-        <div class="mt-3 flex items-center gap-1 text-[11px] text-slate-400">
-          <i data-lucide="activity" class="w-3.5 h-3.5 text-emerald-400"></i>
-          <span>Synced in G: Drive storage</span>
-        </div>
-        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-cyan-500/5 rounded-full blur-xl group-hover:bg-cyan-500/10 transition-colors"></div>
+        <div class="flex items-baseline gap-2"><span id="stat-total-flights" class="text-3xl font-extrabold text-white tracking-tight">0</span><span class="text-xs text-slate-500">flights</span></div>
+        <div class="mt-3 flex items-center gap-1 text-[11px] text-slate-400"><i data-lucide="database" class="w-3.5 h-3.5 text-emerald-400"></i><span>Saved in browser storage</span></div>
       </div>
 
-      <!-- ORD to PR Card -->
       <div class="stat-card bg-slate-900/90 border border-slate-800 rounded-2xl p-5 relative overflow-hidden group hover:border-cyan-500/40 transition-all">
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-xs font-medium text-cyan-400 uppercase tracking-wider">ORD ➔ Puerto Rico</span>
-          <div class="p-2 rounded-xl bg-cyan-950/60 text-cyan-400 border border-cyan-800/40">
-            <i data-lucide="plane-takeoff" class="w-4 h-4"></i>
-          </div>
-        </div>
-        <div class="flex items-baseline justify-between">
-          <div class="flex items-baseline gap-2">
-            <span id="stat-ord-to-pr" class="text-3xl font-extrabold text-cyan-400 tracking-tight">0</span>
-            <span class="text-xs text-slate-500">outbound</span>
-          </div>
-          <button id="quick-add-ord-pr" class="px-2.5 py-1 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 rounded-lg text-xs font-medium transition-all active:scale-95 flex items-center gap-1">
-            <i data-lucide="plus" class="w-3 h-3"></i> Quick +1
-          </button>
-        </div>
-        <div class="mt-3 text-[11px] text-slate-400 flex items-center justify-between">
-          <span>Chicago ➔ San Juan/BQN</span>
-          <span id="stat-ord-pr-pct" class="text-cyan-400 font-semibold">0%</span>
-        </div>
-        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-cyan-500/10 rounded-full blur-xl"></div>
+        <div class="flex items-center justify-between mb-3"><span class="text-xs font-medium text-cyan-400 uppercase tracking-wider">ORD ➔ Puerto Rico</span><div class="p-2 rounded-xl bg-cyan-950/60 text-cyan-400 border border-cyan-800/40"><i data-lucide="plane-takeoff" class="w-4 h-4"></i></div></div>
+        <div class="flex items-baseline justify-between"><div class="flex items-baseline gap-2"><span id="stat-ord-to-pr" class="text-3xl font-extrabold text-cyan-400 tracking-tight">0</span><span class="text-xs text-slate-500">outbound</span></div><button id="quick-add-ord-pr" class="px-2.5 py-1 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 rounded-lg text-xs font-medium transition-all active:scale-95 flex items-center gap-1"><i data-lucide="plus" class="w-3 h-3"></i> Quick +1</button></div>
+        <div class="mt-3 text-[11px] text-slate-400 flex items-center justify-between"><span>Chicago ➔ San Juan/BQN/PSE</span><span id="stat-ord-pr-pct" class="text-cyan-400 font-semibold">0%</span></div>
       </div>
 
-      <!-- PR to ORD Card -->
       <div class="stat-card bg-slate-900/90 border border-slate-800 rounded-2xl p-5 relative overflow-hidden group hover:border-emerald-500/40 transition-all">
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-xs font-medium text-emerald-400 uppercase tracking-wider">Puerto Rico ➔ ORD</span>
-          <div class="p-2 rounded-xl bg-emerald-950/60 text-emerald-400 border border-emerald-800/40">
-            <i data-lucide="plane-landing" class="w-4 h-4"></i>
-          </div>
-        </div>
-        <div class="flex items-baseline justify-between">
-          <div class="flex items-baseline gap-2">
-            <span id="stat-pr-to-ord" class="text-3xl font-extrabold text-emerald-400 tracking-tight">0</span>
-            <span class="text-xs text-slate-500">inbound</span>
-          </div>
-          <button id="quick-add-pr-ord" class="px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-medium transition-all active:scale-95 flex items-center gap-1">
-            <i data-lucide="plus" class="w-3 h-3"></i> Quick +1
-          </button>
-        </div>
-        <div class="mt-3 text-[11px] text-slate-400 flex items-center justify-between">
-          <span>San Juan/BQN ➔ Chicago</span>
-          <span id="stat-pr-ord-pct" class="text-emerald-400 font-semibold">0%</span>
-        </div>
-        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl"></div>
+        <div class="flex items-center justify-between mb-3"><span class="text-xs font-medium text-emerald-400 uppercase tracking-wider">Puerto Rico ➔ ORD</span><div class="p-2 rounded-xl bg-emerald-950/60 text-emerald-400 border border-emerald-800/40"><i data-lucide="plane-landing" class="w-4 h-4"></i></div></div>
+        <div class="flex items-baseline justify-between"><div class="flex items-baseline gap-2"><span id="stat-pr-to-ord" class="text-3xl font-extrabold text-emerald-400 tracking-tight">0</span><span class="text-xs text-slate-500">inbound</span></div><button id="quick-add-pr-ord" class="px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-medium transition-all active:scale-95 flex items-center gap-1"><i data-lucide="plus" class="w-3 h-3"></i> Quick +1</button></div>
+        <div class="mt-3 text-[11px] text-slate-400 flex items-center justify-between"><span>Puerto Rico ➔ Chicago</span><span id="stat-pr-ord-pct" class="text-emerald-400 font-semibold">0%</span></div>
       </div>
 
-      <!-- Active In-Flight Card -->
       <div class="stat-card bg-slate-900/90 border border-slate-800 rounded-2xl p-5 relative overflow-hidden group hover:border-amber-500/40 transition-all">
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-xs font-medium text-amber-400 uppercase tracking-wider">In Flight / Active</span>
-          <div class="p-2 rounded-xl bg-amber-950/60 text-amber-400 border border-amber-800/40">
-            <i data-lucide="radar" class="w-4 h-4"></i>
-          </div>
-        </div>
-        <div class="flex items-baseline gap-2">
-          <span id="stat-active-flights" class="text-3xl font-extrabold text-amber-400 tracking-tight">0</span>
-          <span class="text-xs text-slate-500">active now</span>
-        </div>
-        <div class="mt-3 text-[11px] text-slate-400 flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-          <span>Non-stop flight time ~4h 30m</span>
-        </div>
-        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-amber-500/10 rounded-full blur-xl"></div>
+        <div class="flex items-center justify-between mb-3"><span class="text-xs font-medium text-amber-400 uppercase tracking-wider">In Flight / Active</span><div class="p-2 rounded-xl bg-amber-950/60 text-amber-400 border border-amber-800/40"><i data-lucide="radar" class="w-4 h-4"></i></div></div>
+        <div class="flex items-baseline gap-2"><span id="stat-active-flights" class="text-3xl font-extrabold text-amber-400 tracking-tight">0</span><span class="text-xs text-slate-500">active now</span></div>
+        <div class="mt-3 text-[11px] text-slate-400 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span><span>Across all tracked routes</span></div>
       </div>
-
     </div>
 
-    <!-- Route Visualizer & Info Strip -->
     <div class="bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-900 border border-slate-800 rounded-2xl p-5 lg:p-6 relative overflow-hidden shadow-lg">
       <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-        
-        <!-- Left: Chicago (ORD) -->
         <div class="flex items-center gap-4 w-full md:w-auto">
-          <div class="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex flex-col items-center justify-center flex-shrink-0">
-            <span class="text-xs font-bold text-blue-400 uppercase">ORD</span>
-            <i data-lucide="building" class="w-4 h-4 text-blue-400"></i>
-          </div>
-          <div>
-            <h2 class="font-bold text-white text-base">Chicago O'Hare Intl</h2>
-            <p class="text-xs text-slate-400">Illinois, USA &bull; 41.9742° N, 87.9073° W</p>
-          </div>
+          <div class="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex flex-col items-center justify-center flex-shrink-0"><span class="text-xs font-bold text-blue-400 uppercase">ORD</span><i data-lucide="building" class="w-4 h-4 text-blue-400"></i></div>
+          <div><h2 class="font-bold text-white text-base">Chicago O'Hare Intl</h2><p class="text-xs text-slate-400">Primary ORD ⇄ Puerto Rico route</p></div>
         </div>
-
-        <!-- Middle: Flight Path Visual Indicator -->
         <div class="flex-1 w-full max-w-md flex flex-col items-center gap-2 px-2">
-          <div class="w-full flex items-center justify-between text-[11px] text-slate-400 font-mono">
-            <span class="text-cyan-400 font-semibold" id="visual-ord-count">0 outbound</span>
-            <span class="text-slate-500">2,076 Miles (3,341 km)</span>
-            <span class="text-emerald-400 font-semibold" id="visual-pr-count">0 inbound</span>
-          </div>
-          <div class="w-full relative flex items-center justify-center py-2">
-            <!-- Line -->
-            <div class="w-full h-1 bg-gradient-to-r from-cyan-500 via-slate-700 to-emerald-500 rounded-full"></div>
-            <!-- Airplane icon -->
-            <div class="absolute inset-0 flex items-center justify-center">
-              <span class="p-1.5 rounded-full bg-slate-950 border border-cyan-500/40 shadow-lg text-cyan-400">
-                <i data-lucide="plane" class="w-4 h-4 animate-pulse"></i>
-              </span>
-            </div>
-          </div>
-          <div class="flex items-center gap-4 text-[11px] text-slate-400">
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-cyan-400"></span> United / American</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-400"></span> Southwest / Spirit</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Frontier / JetBlue</span>
-          </div>
+          <div class="w-full flex items-center justify-between text-[11px] text-slate-400 font-mono"><span class="text-cyan-400 font-semibold" id="visual-ord-count">0 outbound</span><span class="text-slate-500">ORD ⇄ PR</span><span class="text-emerald-400 font-semibold" id="visual-pr-count">0 inbound</span></div>
+          <div class="w-full relative flex items-center justify-center py-2"><div class="w-full h-1 bg-gradient-to-r from-cyan-500 via-slate-700 to-emerald-500 rounded-full"></div><div class="absolute inset-0 flex items-center justify-center"><span class="p-1.5 rounded-full bg-slate-950 border border-cyan-500/40 shadow-lg text-cyan-400"><i data-lucide="plane" class="w-4 h-4 animate-pulse"></i></span></div></div>
+          <div class="flex flex-wrap justify-center gap-3 text-[11px] text-slate-400"><span>SJU ➔ JFK added</span><span>•</span><span>JFK ➔ DXB added</span></div>
         </div>
-
-        <!-- Right: Puerto Rico (SJU/BQN) -->
-        <div class="flex items-center gap-4 w-full md:w-auto justify-end">
-          <div class="text-right">
-            <h2 class="font-bold text-white text-base">Puerto Rico (SJU / BQN)</h2>
-            <p class="text-xs text-slate-400">San Juan &amp; Aguadilla &bull; 18.4394° N, 66.0018° W</p>
-          </div>
-          <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col items-center justify-center flex-shrink-0">
-            <span class="text-xs font-bold text-emerald-400 uppercase">SJU</span>
-            <i data-lucide="palmtree" class="w-4 h-4 text-emerald-400"></i>
-          </div>
-        </div>
-
+        <div class="flex items-center gap-4 w-full md:w-auto justify-end"><div class="text-right"><h2 class="font-bold text-white text-base">Puerto Rico</h2><p class="text-xs text-slate-400">SJU / BQN / PSE</p></div><div class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col items-center justify-center flex-shrink-0"><span class="text-xs font-bold text-emerald-400 uppercase">SJU</span><i data-lucide="palmtree" class="w-4 h-4 text-emerald-400"></i></div></div>
       </div>
     </div>
 
-    <!-- Filters & Actions Bar -->
     <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-      
-      <!-- Direction Filter Buttons -->
-      <div class="flex items-center gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800" id="filter-direction-group">
-        <button data-filter="all" class="filter-btn active px-3 py-1 rounded-md text-xs font-medium text-white bg-slate-800 transition-colors">
-          All Flights
-        </button>
-        <button data-filter="ORD-PR" class="filter-btn px-3 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition-colors">
-          ORD ➔ PR
-        </button>
-        <button data-filter="PR-ORD" class="filter-btn px-3 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition-colors">
-          PR ➔ ORD
-        </button>
+      <div class="flex flex-wrap items-center gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800" id="filter-direction-group">
+        <button data-filter="all" class="filter-btn active px-3 py-1 rounded-md text-xs font-medium text-white bg-slate-800 transition-colors">All Flights</button>
+        <button data-filter="ORD-PR" class="filter-btn px-3 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition-colors">ORD ⇄ PR</button>
+        <button data-filter="PR-NYC" class="filter-btn px-3 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition-colors">PR ➔ NYC</button>
+        <button data-filter="NYC-DXB" class="filter-btn px-3 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition-colors">NYC ➔ DXB</button>
       </div>
-
-      <!-- Search & Airline filter -->
       <div class="flex items-center gap-2">
-        <div class="relative flex-1 sm:w-56">
-          <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-          <input type="text" id="search-input" placeholder="Search airline or flight #..." class="w-full pl-8 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
-        </div>
-        <button id="clear-all-btn" class="p-1.5 rounded-lg bg-slate-950 hover:bg-red-950/40 text-slate-400 hover:text-red-400 border border-slate-800 transition-colors" title="Clear all tracked flights">
-          <i data-lucide="trash-2" class="w-4 h-4"></i>
-        </button>
+        <div class="relative flex-1 sm:w-56"><i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i><input type="text" id="search-input" placeholder="Search airline or flight #..." class="w-full pl-8 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"></div>
+        <button id="clear-all-btn" class="p-1.5 rounded-lg bg-slate-950 hover:bg-red-950/40 text-slate-400 hover:text-red-400 border border-slate-800 transition-colors" title="Clear all tracked flights"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
       </div>
-
     </div>
 
-    <!-- Flights Table / List View -->
     <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-      <div class="p-4 border-b border-slate-800 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <i data-lucide="list-filter" class="w-4 h-4 text-cyan-400"></i>
-          <h3 class="text-sm font-semibold text-white">Flight Manifest &amp; Log</h3>
-        </div>
-        <span id="flight-list-count" class="text-xs text-slate-400 font-mono">Showing 0 flights</span>
-      </div>
-
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between"><div class="flex items-center gap-2"><i data-lucide="list-filter" class="w-4 h-4 text-cyan-400"></i><h3 class="text-sm font-semibold text-white">Flight Manifest &amp; Log</h3></div><span id="flight-list-count" class="text-xs text-slate-400 font-mono">Showing 0 flights</span></div>
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs">
-          <thead class="bg-slate-950/60 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-800">
-            <tr>
-              <th class="px-4 py-3">Flight #</th>
-              <th class="px-4 py-3">Airline</th>
-              <th class="px-4 py-3">Route</th>
-              <th class="px-4 py-3">Departure / Date</th>
-              <th class="px-4 py-3">Status</th>
-              <th class="px-4 py-3">Aircraft / Notes</th>
-              <th class="px-4 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="flights-table-body" class="divide-y divide-slate-800/60">
-            <!-- Dynamic rows render here -->
-          </tbody>
+          <thead class="bg-slate-950/60 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-800"><tr><th class="px-4 py-3">Flight #</th><th class="px-4 py-3">Airline</th><th class="px-4 py-3">Route</th><th class="px-4 py-3">Departure / Date</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Aircraft / Notes</th><th class="px-4 py-3 text-right">Actions</th></tr></thead>
+          <tbody id="flights-table-body" class="divide-y divide-slate-800/60"></tbody>
         </table>
       </div>
-
-      <!-- Empty State -->
-      <div id="empty-state" class="hidden p-12 text-center flex-col items-center justify-center space-y-3">
-        <div class="w-12 h-12 rounded-full bg-slate-800/80 flex items-center justify-center text-slate-400 mx-auto">
-          <i data-lucide="plane-slash" class="w-6 h-6"></i>
-        </div>
-        <h4 class="text-sm font-semibold text-slate-300">No flights logged yet</h4>
-        <p class="text-xs text-slate-500 max-w-sm mx-auto">Use the "+ Add Flight" or "Quick +1" buttons above, or click "Load Sample Schedule" to populate realistic ORD ⇄ Puerto Rico flights.</p>
-      </div>
+      <div id="empty-state" class="hidden p-12 text-center flex-col items-center justify-center space-y-3"><div class="w-12 h-12 rounded-full bg-slate-800/80 flex items-center justify-center text-slate-400 mx-auto"><i data-lucide="plane-slash" class="w-6 h-6"></i></div><h4 class="text-sm font-semibold text-slate-300">No flights logged yet</h4><p class="text-xs text-slate-500 max-w-sm mx-auto">Add a flight, use Quick +1 for ORD ⇄ Puerto Rico, or load the sample schedule.</p></div>
     </div>
 
-    <!-- Storage & Firebase Status Indicator Footer Note -->
-    <div class="p-4 rounded-xl bg-slate-900/40 border border-slate-800/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-400">
-      <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-500/50"></span>
-        <span>Storage: <strong class="text-slate-200">Local G: Drive Project (<code>G:\My Drive\Colab\flight-counter-ord-pr</code>)</strong></span>
-      </div>
-      <div class="flex items-center gap-4">
-        <span>Ready for <strong class="text-cyan-400">Firebase Hosting</strong></span>
-        <span>&bull;</span>
-        <span>Editable directly in chat</span>
-      </div>
-    </div>
-
+    <div class="p-4 rounded-xl bg-slate-900/40 border border-slate-800/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-400"><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-500/50"></span><span>Data: <strong class="text-slate-200">localStorage <code>ord_pr_flight_tracker_v1</code></strong></span></div><div class="flex items-center gap-4"><span>Ready for <strong class="text-cyan-400">Firebase Hosting</strong></span><span>•</span><span>Editable from chat</span></div></div>
   </main>
 
-  <!-- Add Flight Modal -->
   <div id="flight-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
-      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-        <h3 class="text-sm font-bold text-white flex items-center gap-2">
-          <i data-lucide="plane-takeoff" class="w-4 h-4 text-cyan-400"></i>
-          <span>Log New Chicago ⇄ PR Flight</span>
-        </h3>
-        <button id="close-modal-btn" class="text-slate-400 hover:text-white p-1 rounded-lg">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800"><h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="plane-takeoff" class="w-4 h-4 text-cyan-400"></i><span>Log New Flight</span></h3><button id="close-modal-btn" class="text-slate-400 hover:text-white p-1 rounded-lg"><i data-lucide="x" class="w-4 h-4"></i></button></div>
       <form id="add-flight-form" class="mt-4 space-y-4 text-xs">
-        
-        <!-- Direction Selection -->
-        <div>
-          <label class="block text-slate-300 font-medium mb-1">Route Direction</label>
-          <select id="modal-direction" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
-            <option value="ORD-SJU">Chicago (ORD) ➔ San Juan (SJU)</option>
-            <option value="SJU-ORD">San Juan (SJU) ➔ Chicago (ORD)</option>
-            <option value="ORD-BQN">Chicago (ORD) ➔ Aguadilla (BQN)</option>
-            <option value="BQN-ORD">Aguadilla (BQN) ➔ Chicago (ORD)</option>
-            <option value="ORD-PSE">Chicago (ORD) ➔ Ponce (PSE)</option>
-            <option value="PSE-ORD">Ponce (PSE) ➔ Chicago (ORD)</option>
-          </select>
-        </div>
-
-        <!-- Airline & Flight Number Grid -->
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-slate-300 font-medium mb-1">Airline</label>
-            <select id="modal-airline" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
-              <option value="United Airlines">United Airlines</option>
-              <option value="American Airlines">American Airlines</option>
-              <option value="Southwest Airlines">Southwest Airlines</option>
-              <option value="Frontier Airlines">Frontier Airlines</option>
-              <option value="Spirit Airlines">Spirit Airlines</option>
-              <option value="JetBlue Airways">JetBlue Airways</option>
-              <option value="Charter / Cargo">Charter / Cargo</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-slate-300 font-medium mb-1">Flight Number</label>
-            <input type="text" id="modal-flight-no" placeholder="e.g. UA 1700" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
-          </div>
-        </div>
-
-        <!-- Date & Status -->
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-slate-300 font-medium mb-1">Date &amp; Time</label>
-            <input type="datetime-local" id="modal-time" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
-          </div>
-          <div>
-            <label class="block text-slate-300 font-medium mb-1">Status</label>
-            <select id="modal-status" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
-              <option value="Scheduled">Scheduled</option>
-              <option value="In Flight">In Flight (Active)</option>
-              <option value="Landed">Landed / Arrived</option>
-              <option value="Delayed">Delayed</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Aircraft / Notes -->
-        <div>
-          <label class="block text-slate-300 font-medium mb-1">Aircraft / Remarks (Optional)</label>
-          <input type="text" id="modal-notes" placeholder="e.g. Boeing 737-MAX9, Non-stop" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500">
-        </div>
-
-        <!-- Submit Button -->
-        <div class="pt-2 flex justify-end gap-2">
-          <button type="button" id="cancel-modal-btn" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors">
-            Cancel
-          </button>
-          <button type="submit" class="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 font-semibold text-white transition-all shadow-md shadow-cyan-500/20">
-            Save Flight
-          </button>
-        </div>
-
+        <div><label class="block text-slate-300 font-medium mb-1">Route Direction</label><select id="modal-direction" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500"><option value="ORD-SJU">Chicago (ORD) ➔ San Juan (SJU)</option><option value="SJU-ORD">San Juan (SJU) ➔ Chicago (ORD)</option><option value="ORD-BQN">Chicago (ORD) ➔ Aguadilla (BQN)</option><option value="BQN-ORD">Aguadilla (BQN) ➔ Chicago (ORD)</option><option value="ORD-PSE">Chicago (ORD) ➔ Ponce (PSE)</option><option value="PSE-ORD">Ponce (PSE) ➔ Chicago (ORD)</option><option value="SJU-JFK">Puerto Rico (SJU) ➔ New York (JFK)</option><option value="JFK-DXB">New York (JFK) ➔ Dubai (DXB)</option></select></div>
+        <div class="grid grid-cols-2 gap-3"><div><label class="block text-slate-300 font-medium mb-1">Airline</label><select id="modal-airline" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500"><option value="United Airlines">United Airlines</option><option value="American Airlines">American Airlines</option><option value="Delta Air Lines">Delta Air Lines</option><option value="Southwest Airlines">Southwest Airlines</option><option value="Frontier Airlines">Frontier Airlines</option><option value="Spirit Airlines">Spirit Airlines</option><option value="JetBlue Airways">JetBlue Airways</option><option value="Emirates">Emirates</option><option value="Charter / Cargo">Charter / Cargo</option></select></div><div><label class="block text-slate-300 font-medium mb-1">Flight Number</label><input type="text" id="modal-flight-no" placeholder="e.g. EK 202" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500"></div></div>
+        <div class="grid grid-cols-2 gap-3"><div><label class="block text-slate-300 font-medium mb-1">Date &amp; Time</label><input type="datetime-local" id="modal-time" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500"></div><div><label class="block text-slate-300 font-medium mb-1">Status</label><select id="modal-status" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500"><option value="Scheduled">Scheduled</option><option value="In Flight">In Flight (Active)</option><option value="Landed">Landed / Arrived</option><option value="Delayed">Delayed</option></select></div></div>
+        <div><label class="block text-slate-300 font-medium mb-1">Aircraft / Remarks (Optional)</label><input type="text" id="modal-notes" placeholder="e.g. Boeing 777, Non-stop" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-white focus:outline-none focus:border-cyan-500"></div>
+        <div class="pt-2 flex justify-end gap-2"><button type="button" id="cancel-modal-btn" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors">Cancel</button><button type="submit" class="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 font-semibold text-white transition-all shadow-md shadow-cyan-500/20">Save Flight</button></div>
       </form>
     </div>
   </div>
