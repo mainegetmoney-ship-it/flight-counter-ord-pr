@@ -1,23 +1,17 @@
-name: Firebase Hosting Pull Request Preview
+name: Deploy to Firebase Hosting on merge
 
 on:
-  pull_request:
+  push:
     branches:
       - main
-    types:
-      - opened
-      - synchronize
-      - reopened
   workflow_dispatch:
 
 permissions:
   checks: write
   contents: read
-  pull-requests: write
 
 jobs:
-  deploy-preview:
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+  build_and_deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -31,17 +25,10 @@ jobs:
       - name: Validate application JavaScript
         run: node --check public/app.js
 
-      - name: Deploy Firebase Hosting preview
-        id: firebase
+      - name: Deploy to Firebase Hosting Live
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORD_PR_FLIGHT_COUNTER }}'
+          channelId: live
           projectId: ord-pr-flight-counter
-          channelId: 'pr-${{ github.event.pull_request.number || github.run_number }}'
-          expires: 7d
-
-      - name: Record preview URL
-        run: |
-          echo "### Firebase Preview" >> "$GITHUB_STEP_SUMMARY"
-          echo "${{ steps.firebase.outputs.urls }}" >> "$GITHUB_STEP_SUMMARY"
